@@ -25,8 +25,8 @@ public:
 	virtual ~TrainingScene();
 	virtual void Update(float dt);
 	ANNTrainer& GetANNTrainer() const;
-	bool IsTraining() const;
-	bool IsRunning() const;
+	virtual bool IsTraining() const;
+	virtual bool IsRunning() const;
 	PhysicsManager & GetPhysicsManager() const;
 
 	void SetNormalSpeed(bool set);

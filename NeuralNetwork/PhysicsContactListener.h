@@ -37,18 +37,6 @@ class PhysicsContactListener : public b2ContactListener
 		}
 	};
 
-	template<typename F>
-	struct Model<F> : Concept
-	{
-		Model(F f) : m_function(f) {}
-
-		F m_function;
-		void operator()()
-		{
-			m_function();
-		}
-	};
-
 public:
 	PhysicsContactListener();
 

@@ -14,13 +14,14 @@ GameScene::GameScene(GraphicsManager& graphicsMgr, const ANNTrainer& trainer) :
 	m_currScore(0),
 	m_sceneSpd(1),
 	m_gameCount(0),
-	m_accumScore(0)
+	m_accumScore(0),
+	m_cutTraining(false)
 {
 	ANNWrapper::ANNConfig annConfig;
 	annConfig.m_numInputs			= 2;
 	annConfig.m_numOutputs			= 1;
 	annConfig.m_numLayers			= 4;
-	annConfig.m_numNeuronsInHidden	= 2;
+	annConfig.m_numNeuronsInHidden	= 3;
 	annConfig.m_maxErr				= 0.001f;
 	annConfig.m_maxEpochs			= 100000;
 	annConfig.m_epochsBtwnReports	= 5000;
@@ -34,10 +35,15 @@ GameScene::GameScene(GraphicsManager& graphicsMgr, const ANNTrainer& trainer) :
 			m_ann->Train();
 		})
 	);
+
+	m_ann->SetEpochCallback(&GameScene::MyEpochCallback, this);
 }
 
 GameScene::~GameScene()
 {
+	StopScene();
+	if (m_annFuture && m_annFuture->valid()) // if still not yet done training
+		m_annFuture->wait();
 }
 
 void GameScene::Update(float dt)
@@ -89,6 +95,16 @@ float GameScene::GetAverageScore() const
 	return m_accumScore / static_cast<float>(m_gameCount);
 }
 
+bool GameScene::IsTraining() const
+{
+	return !m_cutTraining && m_annFuture;
+}
+
+const ANNWrapper& GameScene::GetANN() const
+{
+	return *m_ann;
+}
+
 unsigned GameScene::GetMaxScore() const
 {
 	return m_maxScore;
@@ -102,6 +118,11 @@ const std::map<unsigned, unsigned> & GameScene::GetScoreStatistics() const
 void GameScene::SetSceneSpeed(unsigned set)
 {
 	m_sceneSpd = min(max(1, set), 1 << 12);
+}
+
+void GameScene::PrematureEndTraining()
+{
+	m_cutTraining = true;
 }
 
 void GameScene::UpdateMainEntity(float dt)
@@ -164,6 +185,11 @@ void GameScene::ContactEnterCallback(const ContactInfo & contactInfo)
 	{
 		m_isPlayerOnGround = true;
 	}
+}
+
+bool GameScene::MyEpochCallback(unsigned epoch)
+{
+	return IsRunning() && !m_cutTraining;
 }
 
 void GameScene::RestartGame()

@@ -9,7 +9,9 @@
 
 ANNWrapper::ANNWrapper(const ANNConfig& config) : 
 	m_config(config),
-	m_annTrainer(std::make_unique<ANNTrainer>())
+	m_annTrainer(std::make_unique<ANNTrainer>()),
+	m_currEpoch(0),
+	m_mse(0.f)
 {
 	std::vector<unsigned> layers(m_config.m_numLayers, 0);
 	layers.front() = m_config.m_numInputs;
@@ -21,6 +23,9 @@ ANNWrapper::ANNWrapper(const ANNConfig& config) :
 
 	fann_set_activation_function_hidden(m_ann, FANN_SIGMOID_SYMMETRIC);
 	fann_set_activation_function_output(m_ann, FANN_SIGMOID_SYMMETRIC);
+
+	fann_set_user_data(m_ann, this);
+	fann_set_callback(m_ann, MyANNCallback);
 }
 
 ANNWrapper::~ANNWrapper()
@@ -95,6 +100,26 @@ ANNTrainer& ANNWrapper::GetTrainer()
 	return *m_annTrainer;
 }
 
+unsigned ANNWrapper::GetCurrentEpoch() const
+{
+	return m_currEpoch;
+}
+
+unsigned ANNWrapper::GetMaxEpoch() const
+{
+	return m_config.m_maxEpochs;
+}
+
+float ANNWrapper::GetCurrentMSE() const
+{
+	return m_mse;
+}
+
+float ANNWrapper::GetDesiredMSE() const
+{
+	return m_config.m_maxErr;
+}
+
 void ANNWrapper::TrainFromData(TrainingData * trainingData)
 {
 	if (trainingData == nullptr)
@@ -120,7 +145,32 @@ void ANNWrapper::TrainFromData(TrainingData * trainingData)
 	data.num_input		= m_config.m_numInputs;
 	data.num_output		= m_config.m_numOutputs;
 
-	fann_train_on_data(m_ann, &data, m_config.m_maxEpochs, m_config.m_epochsBtwnReports, m_config.m_maxErr);
+	fann_train_on_data(m_ann, &data, m_config.m_maxEpochs, 1, m_config.m_maxErr);
+}
+
+int FANN_API ANNWrapper::MyANNCallback(	struct fann *ann, struct fann_train_data *train,
+										unsigned int max_epochs,
+										unsigned int epochs_between_reports,
+										float desired_error, unsigned int epochs)
+{
+	ANNWrapper* annWrapper = reinterpret_cast<ANNWrapper*>(fann_get_user_data(ann));
+	
+	bool isRunning = true;
+
+	if (annWrapper->m_epochCallback)
+		isRunning = (annWrapper->m_epochCallback)->operator()(epochs);
+
+	float mse = fann_get_MSE(ann);
+	bool shouldPrintReport = epochs == 1;
+	shouldPrintReport = shouldPrintReport || (epochs % annWrapper->m_config.m_epochsBtwnReports) == 0;
+	shouldPrintReport = shouldPrintReport || mse <= desired_error;
+	if(shouldPrintReport)
+		printf("Epochs     %8d. MSE: %.5f. Desired-MSE: %.5f. Number of fails: %d\n", epochs, mse, desired_error, fann_get_bit_fail(ann));
+
+	annWrapper->m_currEpoch = epochs;
+	annWrapper->m_mse = mse;
+
+	return isRunning ? 0 : -1;
 }
 
 void ANNWrapper::PreprocessData(std::vector<std::vector<fann_type>>& inputs, std::vector<std::vector<fann_type>>& outputs) const

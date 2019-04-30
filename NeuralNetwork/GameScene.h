@@ -34,16 +34,22 @@ public:
 	unsigned GetCurrentScore() const;
 	unsigned GetMaxScore() const;
 	float GetAverageScore() const;
+	bool IsTraining() const override;
+
+	const ANNWrapper& GetANN() const;
 
 	const std::map<unsigned, unsigned> & GetScoreStatistics() const;
 	void SetSceneSpeed(unsigned set);
+	void PrematureEndTraining();
 
 private:
 	virtual void UpdateMainEntity(float dt) override;
 	virtual void RestartGame() override;
 	virtual void ContactEnterCallback(const ContactInfo & contactInfo) override;
 
-	unsigned m_sceneSpd;
+	bool MyEpochCallback(unsigned epoch);
+
+	unsigned							m_sceneSpd;
 
 	std::unique_ptr<std::future<void>>	m_annFuture;
 	std::unique_ptr<ANNWrapper>			m_ann;
@@ -52,4 +58,5 @@ private:
 	unsigned							m_gameCount, m_accumScore;
 
 	std::map<unsigned, unsigned>		m_scoresStats;
+	bool								m_cutTraining;
 };

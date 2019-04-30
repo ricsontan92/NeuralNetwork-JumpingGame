@@ -4,6 +4,7 @@
 
 #include "AppWindow.h"
 #include "GameScene.h"
+#include "ANNWrapper.h"
 #include "ANNTrainer.h"
 #include "SceneManager.h"
 #include "TrainingScene.h"
@@ -137,9 +138,18 @@ void GUIManager::RenderGameInfo()
 
 	if (m_sceneMgr.GetGameScene())
 	{
-		ImGui::Text("Current Score: %d", m_sceneMgr.GetGameScene()->GetCurrentScore());
-		ImGui::Text("Max Score: %d", m_sceneMgr.GetGameScene()->GetMaxScore());
-		ImGui::Text("Avg Score: %2f", m_sceneMgr.GetGameScene()->GetAverageScore());
+		if (!m_sceneMgr.GetGameScene()->IsTraining())
+		{
+			ImGui::Text("Current Score: %d", m_sceneMgr.GetGameScene()->GetCurrentScore());
+			ImGui::Text("Max Score: %d", m_sceneMgr.GetGameScene()->GetMaxScore());
+			ImGui::Text("Avg Score: %2f", m_sceneMgr.GetGameScene()->GetAverageScore());
+			ImGui::Separator();
+		}
+		
+		ImGui::Text("Epochs: %d/%d", m_sceneMgr.GetGameScene()->GetANN().GetCurrentEpoch(), m_sceneMgr.GetGameScene()->GetANN().GetMaxEpoch());
+		ImGui::Text("MSE: %2f (Desired: <= %2f)", m_sceneMgr.GetGameScene()->GetANN().GetCurrentMSE(), m_sceneMgr.GetGameScene()->GetANN().GetDesiredMSE());
+
+		ImGui::Separator();
 
 		ImGui::Text("Scene Speed");
 		ImGui::SameLine();
@@ -159,6 +169,13 @@ void GUIManager::RenderGameInfo()
 		{
 			m_isConfigSet = false;
 			m_sceneMgr.Unload();
+		}
+
+		ImGui::SameLine();
+
+		if (m_sceneMgr.GetGameScene() && m_sceneMgr.GetGameScene()->IsTraining() && ImGui::Button("Stop Training"))
+		{
+			m_sceneMgr.GetGameScene()->PrematureEndTraining();
 		}
 	}
 
