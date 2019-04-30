@@ -7,6 +7,7 @@ ANNTrainer::ANNTrainer()
 
 void ANNTrainer::InputData(const std::vector<fann_type> & inputs, const std::vector<fann_type> & outputs)
 {
+	// insert if data is different from previous
 	ANNInfo info;
 	info.m_inputs = inputs;
 	info.m_outputs = outputs;
@@ -78,11 +79,11 @@ void ANNTrainer::Clear()
 
 ANNTrainer& ANNTrainer::operator+=(const ANNTrainer& rhs)
 {
-	if (this->GetDataCount() == 0)
+	if (GetDataCount() == 0)
 	{
-		m_inputMax = rhs.m_inputMax;
-		m_inputMin = rhs.m_inputMin;
-		m_annInfo = rhs.m_annInfo;
+		m_inputMax	 = rhs.m_inputMax;
+		m_inputMin	= rhs.m_inputMin;
+		m_annInfo	= rhs.m_annInfo;
 	}
 	else
 	{

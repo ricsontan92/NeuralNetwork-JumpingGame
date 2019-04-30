@@ -27,6 +27,7 @@ public:
 	std::vector<fann_type> Run(std::vector<fann_type> inputs);
 	template<unsigned N> std::vector<fann_type> Run(const fann_type (&inputs)[N]);
 	void Train();
+
 	void SetTrainer(std::unique_ptr<ANNTrainer>& trainerData);
 	void SetTrainer(std::unique_ptr<ANNTrainer>&& trainerData);
 	ANNTrainer& GetTrainer();
@@ -44,8 +45,15 @@ public:
 	void TrainFromData(TrainingData * trainingData);
 
 private:
-	friend class ANNTrainer;
+	using InputVec = std::vector<fann_type>;
+	using OutputVec = std::vector<fann_type>;
+	using DataPair = std::pair<InputVec, OutputVec>;
 
+	void PreprocessData(std::vector<std::vector<fann_type>>& inputs, std::vector<std::vector<fann_type>>& outputs) const;
+	void RemoveSimilarData(std::vector<std::pair<InputVec, OutputVec>>& sortedData) const;
+	void ShuffleData(std::vector<std::pair<InputVec, OutputVec>>& sortedData) const;
+
+	friend class ANNTrainer;
 	struct fann * m_ann;
 	ANNConfig m_config;
 	std::unique_ptr<ANNTrainer> m_annTrainer;

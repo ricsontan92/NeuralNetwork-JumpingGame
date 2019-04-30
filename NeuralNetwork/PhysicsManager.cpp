@@ -32,6 +32,7 @@ void PhysicsManager::Update(float dt, int velocityIter, int positionIter)
 
 void PhysicsManager::RenderDebugShapes() const
 {
+	std::lock_guard<std::mutex> lck(m_physicsBodiesMtx);
 	for (auto const& physicBody : m_physicsBodies)
 	{
 		b2Fixture * pFixture = physicBody->m_body->GetFixtureList();
@@ -72,6 +73,7 @@ void PhysicsManager::RenderDebugShapes() const
 
 void PhysicsManager::ClearDestroyedShapes()
 {
+	std::lock_guard<std::mutex> lck(m_physicsBodiesMtx);
 	for (auto it = m_physicsBodies.begin(); it != m_physicsBodies.end();)
 	{
 		PhysicsBody & obj = **it;
@@ -82,7 +84,9 @@ void PhysicsManager::ClearDestroyedShapes()
 			it = m_physicsBodies.erase(it);
 		}
 		else
+		{
 			++it;
+		}
 	}
 	
 }
@@ -110,6 +114,7 @@ b2Fixture* PhysicsManager::CreateFixture(b2Body* body, const b2Shape& shape) con
 
 void PhysicsManager::CreatePhysicsBody(b2Body* body)
 {
+	std::lock_guard<std::mutex> lck(m_physicsBodiesMtx);
 	m_physicsBodies.emplace_back(std::make_shared<PhysicsBody>(body));
 	body->SetUserData(&(*m_physicsBodies.back()));
 }
@@ -146,6 +151,7 @@ const PhysicsContactListener& PhysicsManager::GetContactListener() const
 
 void PhysicsManager::Clear()
 {
+	std::lock_guard<std::mutex> lck(m_physicsBodiesMtx);
 	for (auto & body : m_physicsBodies)
 	{
 		m_world->DestroyBody(body->m_body);

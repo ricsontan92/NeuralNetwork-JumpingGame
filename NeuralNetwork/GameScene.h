@@ -1,13 +1,17 @@
 #pragma once
 
+#include <map>
 #include <string>
 #include <vector>
 #include <memory>
-
+#include <future>
 #include "FANN/fann.h"
 
 #include "math.h"
+#include "JumpData.h"
 #include "Randomizer.h"
+#include "TrainingScene.h"
+#include "SceneConstants.h"
 
 class ANNTrainer;
 class ANNWrapper;
@@ -18,31 +22,34 @@ class GraphicsManager;
 struct ContactInfo;
 struct JumpData;
 
-class GameScene
+class GameScene : private TrainingScene
 {
 public:
 	GameScene(GraphicsManager& graphicsMgr, const ANNTrainer& trainer);
 	~GameScene();
-	void Update(float dt);
+
+	virtual void Update(float dt) override;
+
+	unsigned GetSceneSpeed() const;
+	unsigned GetCurrentScore() const;
+	unsigned GetMaxScore() const;
+	float GetAverageScore() const;
+
+	const std::map<unsigned, unsigned> & GetScoreStatistics() const;
+	void SetSceneSpeed(unsigned set);
 
 private:
-	void UpdateMainEntity(float dt);
-	void UpdateBulletEntity(float dt);
-	void ContactEnterCallback(const ContactInfo & contactInfo);
-	void ContactExitCallback(const ContactInfo & contactInfo);
+	virtual void UpdateMainEntity(float dt) override;
+	virtual void RestartGame() override;
+	virtual void ContactEnterCallback(const ContactInfo & contactInfo) override;
 
-	void StartGame();
-	void RestartGame();
-	void EndGame();
+	unsigned m_sceneSpd;
 
-	bool	m_isPlayerOnGround;
-	bool	m_gameRestarting;
+	std::unique_ptr<std::future<void>>	m_annFuture;
+	std::unique_ptr<ANNWrapper>			m_ann;
 
-	GraphicsManager&				m_graphicsMgr;
+	unsigned							m_maxScore, m_currScore;
+	unsigned							m_gameCount, m_accumScore;
 
-	std::unique_ptr<ANNWrapper>		m_ann;
-	std::unique_ptr<PhysicsManager> m_physicsMgr;
-
-	std::shared_ptr<PhysicsBody>	m_mainEntity;
-	std::shared_ptr<PhysicsBody>	m_bulletEntity;
+	std::map<unsigned, unsigned>		m_scoresStats;
 };

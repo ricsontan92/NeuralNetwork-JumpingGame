@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <memory>
+#include <mutex>
 
 class b2World;
 class DebugDrawer;
@@ -53,4 +54,5 @@ private:
 
 	std::vector<b2Body*>						m_allBodies;
 	std::vector<std::shared_ptr<PhysicsBody>>	m_physicsBodies;
+	mutable std::mutex							m_physicsBodiesMtx;
 };

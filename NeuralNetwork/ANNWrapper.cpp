@@ -5,6 +5,7 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
+#include <algorithm>
 
 ANNWrapper::ANNWrapper(const ANNConfig& config) : 
 	m_config(config),
@@ -41,12 +42,15 @@ void ANNWrapper::Train()
 {
 	auto allOutputs = m_annTrainer->GetAllOutputs();
 	auto allInputs	= m_annTrainer->GetAllInputs();
+
+	PreprocessData(allInputs, allOutputs);
+
 	int failures	= 0, successes = 0;
 
 	std::vector<std::vector<fann_type>> successIns, successOuts;
 	std::vector<std::vector<fann_type>> failureIns, failureOuts;
 
-	for (unsigned i = 0; i < m_annTrainer->GetDataCount(); ++i)
+	for (unsigned i = 0; i < allInputs.size(); ++i)
 	{
 		if (allOutputs[i][0] == -1.f)
 		{
@@ -62,7 +66,8 @@ void ANNWrapper::Train()
 		}
 	}
 
-	std::cout << "Total Samples: " << m_annTrainer->GetDataCount() << std::endl;
+	std::cout << "Total Samples(Before Preprocessing): " << m_annTrainer->GetDataCount() << std::endl;
+	std::cout << "Total Samples(After Preprocessing): " << allInputs.size() << std::endl;
 	std::cout << "Failures: "	<< failures << std::endl;
 	std::cout << "Successes: "	<< successes << std::endl;
 
@@ -70,38 +75,9 @@ void ANNWrapper::Train()
 	data.m_inputs = std::move(allInputs);
 	data.m_outputs = std::move(allOutputs);
 
-	// make data ~50% - ~50%
-	if (successes > 0 && failures > 0)
-	{
-		if (successes < failures)
-		{
-			int diff = failures - successes;
-			while (diff > 0)
-			{
-				for (int i = 0; i < successes; ++i)
-				{
-					data.m_inputs.push_back(successIns[i]);
-					data.m_outputs.push_back(successOuts[i]);
-				}
-				diff -= successes;
-			}
-		}
-		else if (failures < successes)
-		{
-			int diff = successes - failures;
-			while (diff > 0)
-			{
-				for (int i = 0; i < failures; ++i)
-				{
-					data.m_inputs.push_back(failureIns[i]);
-					data.m_outputs.push_back(failureOuts[i]);
-				}
-				diff -= failures;
-			}
-		}
-	}
-
 	TrainFromData(&data);
+
+	m_annTrainer->Clear();
 }
 
 void ANNWrapper::SetTrainer(std::unique_ptr<ANNTrainer>& trainerData)
@@ -145,4 +121,72 @@ void ANNWrapper::TrainFromData(TrainingData * trainingData)
 	data.num_output		= m_config.m_numOutputs;
 
 	fann_train_on_data(m_ann, &data, m_config.m_maxEpochs, m_config.m_epochsBtwnReports, m_config.m_maxErr);
+}
+
+void ANNWrapper::PreprocessData(std::vector<std::vector<fann_type>>& inputs, std::vector<std::vector<fann_type>>& outputs) const
+{
+	std::cout << "Preprocessing data..." << std::endl;
+
+	// remove similar data
+	std::vector<std::pair<InputVec, OutputVec>> vData(inputs.size(), std::make_pair<InputVec, OutputVec>({}, {}));
+	
+	for (unsigned i = 0; i < inputs.size(); ++i)
+	{
+		vData[i].first	= std::move(inputs[i]);
+		vData[i].second = std::move(outputs[i]);
+	}
+
+	std::sort(vData.begin(), vData.end(), [](const DataPair& l, const DataPair& r) 
+	{
+		for (unsigned i = 0; i < l.first.size(); ++i)
+		{
+			if (l.first[i] < r.first[i])
+				return true;
+			else if (l.first[i] > r.first[i])
+				return false;
+		}
+		return false;
+	});
+
+	// preprocessing starts here
+	RemoveSimilarData(vData);
+
+	inputs.clear();
+	outputs.clear();
+
+	ShuffleData(vData);
+	for (auto & data : vData)
+	{
+		inputs.emplace_back(std::move(data.first));
+		outputs.emplace_back(std::move(data.second));
+	}
+}
+
+void ANNWrapper::RemoveSimilarData(std::vector<std::pair<InputVec, OutputVec>>& sortedData) const
+{
+	std::cout << "\t* Remove Similar Data..." << std::endl;
+
+	for (auto it = sortedData.begin() + 1; it != sortedData.end();)
+	{
+		InputVec & prev = (it - 1)->first;
+		InputVec & curr = (it - 0)->first;
+
+		float totalDiff = 0.f;
+
+		for (unsigned k = 0; k < curr.size(); ++k)
+		{
+			float diff = (curr[k] - prev[k]);
+			totalDiff += diff * diff;
+		}
+
+		if (totalDiff <= 0.001f)
+			it = sortedData.erase(it);
+		else
+			it++;
+	}
+}
+
+void ANNWrapper::ShuffleData(std::vector<std::pair<InputVec, OutputVec>>& sortedData) const
+{
+	std::random_shuffle(sortedData.begin(), sortedData.end());
 }

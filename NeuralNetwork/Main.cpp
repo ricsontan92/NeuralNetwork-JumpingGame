@@ -4,7 +4,9 @@
 #include "ANNTrainer.h"
 #include "GUIManager.h"
 #include "DebugDrawer.h"
+#include "SceneManager.h"
 #include "TrainingScene.h"
+#include "SceneConstants.h"
 #include "PhysicsManager.h"
 #include "GraphicsManager.h"
 
@@ -14,8 +16,6 @@
 #include <vector>
 #include <future>
 #include <array>
-
-double DISCRETE_DT = 1.0 / 60.0;
 
 int main()
 {
@@ -34,35 +34,11 @@ int main()
 	// init graphics managers
 	GraphicsManager graphicsMgr;
 
-	// training scene
-	std::vector<std::future<ANNTrainer>> mTrainers;	
-	for (unsigned i = 0; i < 4; ++i)
-	{
-		mTrainers.push_back(std::async(
-			[&graphicsMgr]()->ANNTrainer
-			{
-				TrainingScene trainScene{ graphicsMgr , 15000 };
-				while (trainScene.IsTraining())
-				{
-					trainScene.Update(static_cast<float>(DISCRETE_DT));
-				}
-				return trainScene.GetANNTrainer();
-			}
-		));
-	}
-
-	ANNTrainer combinedTrainer;
-	for (auto & trainer : mTrainers)
-	{
-		trainer.wait();
-		combinedTrainer += trainer.get();
-	}
-
-	// scene creation
-	GameScene gameScene{ graphicsMgr, combinedTrainer };
+	// scene manager
+	SceneManager sceneMgr{ graphicsMgr };
 
 	// gui creation
-	GUIManager guiMgr{ gameScene, mainWin };
+	GUIManager guiMgr{ sceneMgr, mainWin };
 
 	while (!mainWin.ShouldClose())
 	{
@@ -82,7 +58,7 @@ int main()
 		// updating here
 		float fdt = static_cast<float>(DISCRETE_DT);
 		mainWin.Update();
-		gameScene.Update(fdt);
+		sceneMgr.Update(fdt);
 		guiMgr.Update(fdt);
 
 		// rendering here

@@ -22,10 +22,18 @@ class TrainingScene
 {
 public:
 	TrainingScene(GraphicsManager& graphicsMgr, unsigned maxTrainingCount);
-	~TrainingScene();
+	virtual ~TrainingScene();
 	virtual void Update(float dt);
 	ANNTrainer& GetANNTrainer() const;
 	bool IsTraining() const;
+	bool IsRunning() const;
+	PhysicsManager & GetPhysicsManager() const;
+
+	void SetNormalSpeed(bool set);
+	bool GetNormalSpeed() const;
+
+	void StopScene();
+
 protected:
 	virtual void UpdateMainEntity(float dt);
 	virtual void UpdateBulletEntity(float dt);
@@ -36,18 +44,20 @@ protected:
 	virtual void RestartGame();
 	virtual void EndGame();
 
-	unsigned						m_maxTrainingCount;
-
-	float							m_jumpTimer;
+	bool							m_isRunning;
 	bool							m_isPlayerOnGround;
 	bool							m_gameRestarting;
 
-	Randomizer						m_randomizer;
-
-	std::unique_ptr<ANNTrainer>		m_annTrainer;
 	std::unique_ptr<PhysicsManager> m_physicsMgr;
-	std::unique_ptr<JumpData>		m_jumpData;
 
 	std::shared_ptr<PhysicsBody>	m_mainEntity;
 	std::shared_ptr<PhysicsBody>	m_bulletEntity;
+
+private:
+	Randomizer						m_randomizer, m_bulletSpdRandomizer;
+	std::unique_ptr<ANNTrainer>		m_annTrainer;
+	std::unique_ptr<JumpData>		m_jumpData;
+	unsigned						m_maxTrainingCount;
+	float							m_jumpTimer;
+	bool							m_normalSpd;
 };

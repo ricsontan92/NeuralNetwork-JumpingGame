@@ -1,12 +1,13 @@
 #pragma once
 
-class GameScene;
+#include "SceneManager.h"
+
 class AppWindow;
 
 class GUIManager
 {
 public:
-	GUIManager(GameScene & scene, AppWindow & appWin);
+	GUIManager(SceneManager & scene, AppWindow & appWin);
 	~GUIManager();
 	void Update(float dt);
 	void Render();
@@ -14,6 +15,14 @@ public:
 private:
 	void BegFrame();
 	void EndFrame();
-	AppWindow & m_appWin;
-	GameScene & m_gameScene;
+	void RenderOverlay(float alpha);
+
+	void RenderGameInfo();
+	void RenderHistogram();
+	void RenderGameConfig();
+
+	SceneManager::ScenesConfig m_scenConfig;
+	bool			m_isConfigSet;
+	AppWindow &		m_appWin;
+	SceneManager &	m_sceneMgr;
 };

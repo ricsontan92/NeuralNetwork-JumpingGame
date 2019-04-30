@@ -6,7 +6,7 @@
 #include "GL\glew.h"
 #include "GLFW\glfw3.h"
 
-static const char * TITLE = "Neural Network(Educational)";
+static const char * TITLE = "Neural Network(Jump Game)";
 
 AppWindow::AppWindow() : m_fps(0), m_prevFPS(0)
 {

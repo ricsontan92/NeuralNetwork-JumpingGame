@@ -149,6 +149,9 @@
     <ClCompile Include="PhysicsContactListener.cpp" />
     <ClCompile Include="PhysicsManager.cpp" />
     <ClCompile Include="quat.cpp" />
+    <ClCompile Include="Randomizer.cpp" />
+    <ClCompile Include="SceneConstants.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="TrainingScene.cpp" />
     <ClCompile Include="vec2.cpp" />
     <ClCompile Include="vec3.cpp" />
@@ -175,6 +178,7 @@
     <ClInclude Include="GLShader.h" />
     <ClInclude Include="GraphicsManager.h" />
     <ClInclude Include="GUIManager.h" />
+    <ClInclude Include="SceneConstants.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_glfw.h" />
@@ -191,6 +195,7 @@
     <ClInclude Include="PhysicsManager.h" />
     <ClInclude Include="quat.h" />
     <ClInclude Include="Randomizer.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="TrainingScene.h" />
     <ClInclude Include="vec2.h" />
     <ClInclude Include="vec3.h" />
