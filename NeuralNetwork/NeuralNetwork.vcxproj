@@ -84,7 +84,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32d.lib;opengl32.lib;glfw3d.lib;Box2D.lib;fannfloatd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOILd.lib;glew32d.lib;opengl32.lib;glfw3d.lib;Box2D.lib;fannfloatd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -108,7 +108,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>../Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;opengl32.lib;glfw3.lib;Box2D.lib;fannfloat.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SOIL.lib;glew32.lib;opengl32.lib;glfw3.lib;Box2D.lib;fannfloat.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,6 +135,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="GLImage2D.cpp" />
+    <ClCompile Include="GLRenderer.cpp" />
     <ClCompile Include="GLShader.cpp" />
     <ClCompile Include="GraphicsManager.cpp" />
     <ClCompile Include="GUIManager.cpp" />
@@ -164,6 +166,9 @@
     <ProjectReference Include="..\fannfloat\fannfloat.vcxproj">
       <Project>{2f0ec4b6-b3f8-4a05-a884-b935e82e1390}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Simple OpenGL Image Library\SOIL.vcxproj">
+      <Project>{c32fb2b4-500c-43cd-a099-eecce079d3f1}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ANNTrainer.h" />
@@ -175,7 +180,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="GLImage2D.h" />
+    <ClInclude Include="GLRenderer.h" />
     <ClInclude Include="GLShader.h" />
+    <ClInclude Include="GraphicsBuffers.h" />
     <ClInclude Include="GraphicsManager.h" />
     <ClInclude Include="GUIManager.h" />
     <ClInclude Include="SceneConstants.h" />
@@ -202,6 +210,8 @@
     <ClInclude Include="vec4.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\BasicShader.frag" />
+    <None Include="Assets\BasicShader.vert" />
     <None Include="Assets\DebugShader.frag" />
     <None Include="Assets\DebugShader.vert" />
   </ItemGroup>

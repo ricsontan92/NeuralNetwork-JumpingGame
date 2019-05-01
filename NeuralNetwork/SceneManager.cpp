@@ -25,7 +25,7 @@ void SceneManager::Init(const ScenesConfig& config)
 	m_config = config;
 
 	// training scenes
-	unsigned sceneCount = m_config.m_threaded ? std::thread::hardware_concurrency() : 1;
+	unsigned sceneCount = m_config.m_threaded ? max(1, std::thread::hardware_concurrency() - 1) : 1;
 	unsigned perScene	= config.m_samplesCount / sceneCount;
 	for (unsigned i = 1; i <= sceneCount; ++i)
 	{

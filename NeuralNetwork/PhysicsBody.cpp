@@ -1,4 +1,5 @@
 #include "PhysicsBody.h"
+#include "PhysicsManager.h"
 
 PhysicsBody::PhysicsBody(b2Body * body) :
 	m_body(body),
@@ -76,13 +77,13 @@ float PhysicsBody::GetGravityScale() const
 math::vec2 PhysicsBody::GetPosition() const
 {
 	b2Vec2 pos = m_body->GetPosition();
-	return math::vec2(pos.x, pos.y);
+	return math::vec2(pos.x, pos.y) * PhysicsManager::BOX2D_SCALE_FACTOR;
 }
 
 math::vec2 PhysicsBody::GetVelocity() const
 {
 	b2Vec2 spd = m_body->GetLinearVelocity();
-	return math::vec2(spd.x, spd.y);
+	return math::vec2(spd.x, spd.y) * PhysicsManager::BOX2D_SCALE_FACTOR;
 }
 
 bool PhysicsBody::IsDestroyed() const

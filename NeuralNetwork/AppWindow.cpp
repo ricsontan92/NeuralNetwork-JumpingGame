@@ -2,11 +2,17 @@
 
 #include <string>
 #include <chrono>
+#include <iostream>
 
 #include "GL\glew.h"
 #include "GLFW\glfw3.h"
 
 static const char * TITLE = "Neural Network(Jump Game)";
+
+void AppWindow::WindowSizeChangeCallback(GLFWwindow* window, int newWt, int newHt)
+{
+
+}
 
 AppWindow::AppWindow() : m_fps(0), m_prevFPS(0)
 {
@@ -51,6 +57,10 @@ bool AppWindow::Init(unsigned winWd, unsigned winHt)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glEnable(GL_DEPTH_TEST);
+
+	glfwSetWindowSizeCallback(m_window, WindowSizeChangeCallback);
+
+	std::cout << "Graphics: " << glGetString(GL_RENDERER) << std::endl;;
 
 	return true;
 }

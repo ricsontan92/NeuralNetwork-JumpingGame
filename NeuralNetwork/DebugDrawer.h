@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "GraphicsBuffers.h"
 #include "GLShader.h"
 #include "math.h"
 
@@ -42,58 +43,7 @@ private:
 	std::vector<DebugModel> m_models;
 	GraphicsManager& m_graphicsMgr;
 
-	struct GraphicsBuffer
-	{
-		GLuint m_VAO, m_VBO, m_EBO;
-	}m_boxBuffer, m_lineBuffer, m_circleBuffer;
+	GraphicsBuffers m_boxBuffer, m_lineBuffer, m_circleBuffer;
 
 	void InitializeBuffers();
-
-	template<typename T, typename V, unsigned K, unsigned L>
-	void SetupVAOs(DebugDrawer::GraphicsBuffer& buffer, const T(&vertices)[K], const V(&indices)[L]) const;
-
-	template<typename T, typename V>
-	void SetupVAOs(DebugDrawer::GraphicsBuffer& buffer, std::vector<T> const & vertices, const std::vector<V> & indices) const;
 };
-
-
-template<typename T, typename V, unsigned K, unsigned L>
-void DebugDrawer::SetupVAOs(DebugDrawer::GraphicsBuffer& buffer, const T(&vertices)[K], const V(&indices)[L]) const
-{
-	//Vertex Buffers 
-	glGenVertexArrays(1, &buffer.m_VAO);
-	glGenBuffers(1, &buffer.m_VBO);
-	glGenBuffers(1, &buffer.m_EBO);
-
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray(buffer.m_VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, buffer.m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-}
-
-template<typename T, typename V>
-void DebugDrawer::SetupVAOs(DebugDrawer::GraphicsBuffer& buffer, std::vector<T> const & vertices, const std::vector<V> & indices) const
-{
-	glGenVertexArrays(1, &buffer.m_VAO);
-	glGenBuffers(1, &buffer.m_VBO);
-	glGenBuffers(1, &buffer.m_EBO);
-
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray(buffer.m_VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, buffer.m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer.m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-}

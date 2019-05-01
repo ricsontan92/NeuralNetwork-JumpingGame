@@ -3,6 +3,7 @@
 #include "GameScene.h"
 #include "ANNTrainer.h"
 #include "GUIManager.h"
+#include "GLRenderer.h"
 #include "DebugDrawer.h"
 #include "SceneManager.h"
 #include "TrainingScene.h"
@@ -16,6 +17,8 @@
 #include <vector>
 #include <future>
 #include <array>
+
+#include "SOIL/Soil.h"
 
 int main()
 {
@@ -33,6 +36,8 @@ int main()
 
 	// init graphics managers
 	GraphicsManager graphicsMgr;
+	graphicsMgr.SetVirtualWinsize(winWidth, winHeight);
+	graphicsMgr.SetBackgroundColor(math::vec4(0.15f, 0.15f, 0.15f, 1.f));
 
 	// scene manager
 	SceneManager sceneMgr{ graphicsMgr };
@@ -50,7 +55,7 @@ int main()
 		// Keep running
 		graphicsMgr.StartFrame();
 
-			// set viewport
+		// set viewport
 		int winWd, winHt;
 		mainWin.GetFrameBufferSize(winWd, winHt);
 		graphicsMgr.SetViewport(0, 0, winWd, winHt);
@@ -73,7 +78,7 @@ int main()
 		// frame rate controller
 		do
 		{
-			std::this_thread::sleep_for(std::chrono::duration<double, std::nano>(1));
+			std::this_thread::sleep_for(std::chrono::duration<double, std::nano>(0));
 			dt = std::chrono::duration_cast<std::chrono::duration<double>>(std::chrono::high_resolution_clock::now() - time_start).count();
 		} while (dt < DISCRETE_DT);
 

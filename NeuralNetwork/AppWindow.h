@@ -28,6 +28,8 @@ public:
 	void GetFrameBufferSize(int & width, int & height) const;
 
 private:
+	static void WindowSizeChangeCallback(GLFWwindow*, int, int);
+
 	std::chrono::steady_clock::time_point m_timePt;
 	int m_fps, m_prevFPS;
 	GLFWwindow* m_window;

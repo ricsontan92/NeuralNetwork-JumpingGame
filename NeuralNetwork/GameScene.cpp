@@ -1,4 +1,6 @@
 #include "GameScene.h"
+
+#include "GLRenderer.h"
 #include "ANNTrainer.h"
 #include "ANNWrapper.h"
 #include "PhysicsBody.h"
@@ -15,7 +17,8 @@ GameScene::GameScene(GraphicsManager& graphicsMgr, const ANNTrainer& trainer) :
 	m_sceneSpd(1),
 	m_gameCount(0),
 	m_accumScore(0),
-	m_cutTraining(false)
+	m_cutTraining(false),
+	m_graphicsMgr(graphicsMgr)
 {
 	ANNWrapper::ANNConfig annConfig;
 	annConfig.m_numInputs			= 2;

@@ -1,4 +1,5 @@
 #include "vec2.h"
+#include "vec3.h"
 #include <cmath>
 #include <float.h>
 
@@ -157,6 +158,11 @@ namespace math
 	{
 		*this = *this * rhs;
 		return *this;
+	}
+
+	vec2::operator vec3() const
+	{
+		return vec3(x, y, 0.f);
 	}
 
 	float& vec2::operator[](int index)

@@ -4,6 +4,8 @@
 
 namespace math
 {
+	class vec3;
+
 	class vec2
 	{
 	public:
@@ -39,6 +41,8 @@ namespace math
 		vec2& operator-=(const vec2& rhs);
 		vec2& operator/=(float rhs);
 		vec2& operator*=(float rhs);
+
+		operator vec3() const;
 
 		float& operator[](int index);
 		float operator[](int index) const;

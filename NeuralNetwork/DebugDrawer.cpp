@@ -8,11 +8,8 @@
 
 void DebugDrawer::InitializeBuffers()
 {
-	//Vertex Buffers ( boxes )
-	SetupVAOs(m_boxBuffer, gLineVertices, gLineIndices);
-
-	//Vertex Buffers ( line )
-	SetupVAOs(m_lineBuffer, gQuadVertices, gQuadIndices);
+	m_boxBuffer.SetupVAOs(gLineVertices, gLineIndices);
+	m_lineBuffer.SetupVAOs(gQuadVertices, gQuadIndices);
 
 	//Vertex Buffers ( circle )
 	{
@@ -29,7 +26,8 @@ void DebugDrawer::InitializeBuffers()
 			circleIndices.push_back(i);
 			circleIndices.push_back((i + 1) % CIRCLE_SEGMENTS);
 		}
-		SetupVAOs(m_circleBuffer, circleVerts, circleIndices);
+
+		m_circleBuffer.SetupVAOs(circleVerts, circleIndices);
 	}
 
 	// note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
