@@ -2,6 +2,8 @@
 
 Simple Jumping game using Neural Network
 
+Video Showcase: https://www.youtube.com/watch?v=iuogHNSpLgY
+
 1) Generate jumping samples from random data
     * Multi-core option available for faster generation of data
 2) Preprocess data
