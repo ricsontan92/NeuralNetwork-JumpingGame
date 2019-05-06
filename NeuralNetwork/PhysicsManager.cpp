@@ -126,6 +126,9 @@ PhysicBodyPtr PhysicsManager::AddCircle(const math::vec2 & pos, float angle, flo
 
 	m_allBodies.push_back(CreateBody(pos, DEG_TO_RAD(angle), b2BodyType(bodyType)));
 	CreatePhysicsBody(CreateFixture(m_allBodies.back(), shape)->GetBody());
+
+	m_physicsBodies.back()->m_worldScale = math::vec2(radius, radius);
+
 	return m_physicsBodies.back();
 }
 
@@ -136,6 +139,10 @@ PhysicBodyPtr PhysicsManager::AddBox(const math::vec2 & pos, const math::vec2& s
 
 	m_allBodies.push_back(CreateBody(pos, DEG_TO_RAD(angle), b2BodyType(bodyType)));
 	CreatePhysicsBody(CreateFixture(m_allBodies.back(), shape)->GetBody());
+
+	m_physicsBodies.back()->m_worldScale = size;
+
+
 	return m_physicsBodies.back();
 }
 

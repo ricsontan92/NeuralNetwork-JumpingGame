@@ -79,8 +79,15 @@ Camera const & GraphicsManager::GetMainCamera() const
 	return *m_mainCam;
 }
 
+const math::vec2& GraphicsManager::GetVirtualWindowSize() const
+{
+	return m_virtualSize;
+}
+
 void GraphicsManager::SetVirtualWinsize(int width, int height)
 {
+	m_virtualSize = math::vec2(static_cast<float>(width), static_cast<float>(height));
+
 	float half_width = 0.5f * width;
 	float half_height = 0.5f * height;
 	m_mainCam->SetOrtho(half_width, -half_width, -half_height, half_height, -1.f, 1.f);
@@ -125,16 +132,11 @@ void GraphicsManager::SetViewport(int minX, int minY, int maxX, int maxY)
 
 void GraphicsManager::RenderBackground() const
 {
-	GLboolean last_enable_depth_test = glIsEnabled(GL_DEPTH_TEST);
-	glDisable(GL_DEPTH_TEST);
-
 	// render background
 	m_bgShader.UseProgram();
 	m_bgShader.SetMat44("projView", GetMainCamera().Get2DProjection());
 	glBindVertexArray(m_bgBuffer.m_VAO);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-	if(last_enable_depth_test) glEnable(GL_DEPTH_TEST);
 }
 
 const float gQuadVertices[20] =

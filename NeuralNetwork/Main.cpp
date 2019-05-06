@@ -37,7 +37,7 @@ int main()
 	// init graphics managers
 	GraphicsManager graphicsMgr;
 	graphicsMgr.SetVirtualWinsize(winWidth, winHeight);
-	graphicsMgr.SetBackgroundColor(math::vec4(0.15f, 0.15f, 0.15f, 1.f));
+	graphicsMgr.SetBackgroundColor(math::vec4(0.35f, 0.45f, 0.85f, 1.f));
 
 	// scene manager
 	SceneManager sceneMgr{ graphicsMgr };

@@ -9,6 +9,7 @@ struct JumpData
 	{
 		X_DIST = 0,
 		X_SPEED,
+		Y_DIST,
 		COUNT
 	};
 

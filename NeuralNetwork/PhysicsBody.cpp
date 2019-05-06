@@ -49,6 +49,16 @@ void PhysicsBody::SetDensity(float set)
 	m_body->ResetMassData();
 }
 
+void PhysicsBody::SetVelocity(const math::vec2 & velocity)
+{
+	m_body->SetLinearVelocity(b2Vec2(velocity.x * PhysicsManager::INV_BOX2D_SCALE_FACTOR, velocity.y * PhysicsManager::INV_BOX2D_SCALE_FACTOR));
+}
+
+void PhysicsBody::LockRotation(bool set)
+{
+	m_body->SetFixedRotation(set);
+}
+
 void PhysicsBody::Destroy()
 {
 	m_destroyed = true;
@@ -84,6 +94,11 @@ math::vec2 PhysicsBody::GetVelocity() const
 {
 	b2Vec2 spd = m_body->GetLinearVelocity();
 	return math::vec2(spd.x, spd.y) * PhysicsManager::BOX2D_SCALE_FACTOR;
+}
+
+math::vec2 PhysicsBody::GetScale() const
+{
+	return m_worldScale;
 }
 
 bool PhysicsBody::IsDestroyed() const

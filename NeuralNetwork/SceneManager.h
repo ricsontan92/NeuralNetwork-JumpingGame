@@ -13,9 +13,9 @@ class SceneManager
 public:
 	struct ScenesConfig
 	{
-		unsigned	m_samplesCount	= 50000;
+		unsigned	m_samplesCount	= 5000;
 		float		m_discreteDT	= 1.f / 60.f;
-		bool		m_threaded		= false;
+		bool		m_threaded		= true;
 	};
 
 	SceneManager(GraphicsManager& graphicsMgr);

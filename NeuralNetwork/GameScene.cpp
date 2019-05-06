@@ -17,11 +17,10 @@ GameScene::GameScene(GraphicsManager& graphicsMgr, const ANNTrainer& trainer) :
 	m_sceneSpd(1),
 	m_gameCount(0),
 	m_accumScore(0),
-	m_cutTraining(false),
-	m_graphicsMgr(graphicsMgr)
+	m_cutTraining(false)
 {
 	ANNWrapper::ANNConfig annConfig;
-	annConfig.m_numInputs			= 2;
+	annConfig.m_numInputs			= (unsigned)JumpData::INPUT_TYPE::COUNT;
 	annConfig.m_numOutputs			= 1;
 	annConfig.m_numLayers			= 4;
 	annConfig.m_numNeuronsInHidden	= 3;
@@ -51,6 +50,15 @@ GameScene::~GameScene()
 
 void GameScene::Update(float dt)
 {
+	if ((m_animTimer += dt) >= 0.05f)
+	{
+		if (m_isPlayerOnGround)
+			m_characterTextureInfo.m_currFrame = fmodf(m_characterTextureInfo.m_currFrame + 1.f, round(m_characterTextureInfo.m_cols * m_characterTextureInfo.m_rows * 0.5f));
+		else
+			m_characterTextureInfo.m_currFrame = 2.f;
+		m_animTimer = 0;
+	}
+
 	if (m_annFuture)
 	{
 		if (m_annFuture->wait_for(std::chrono::seconds(0)) == std::future_status::ready)
@@ -78,6 +86,7 @@ void GameScene::Update(float dt)
 		}
 	}
 
+	Render();
 	m_physicsMgr->RenderDebugShapes();
 }
 
@@ -140,11 +149,13 @@ void GameScene::UpdateMainEntity(float dt)
 		float inputs[(unsigned)JumpData::INPUT_TYPE::COUNT];
 		inputs[(unsigned)JumpData::INPUT_TYPE::X_DIST]	= m_mainEntity->GetPosition().x - m_bulletEntity->GetPosition().x;
 		inputs[(unsigned)JumpData::INPUT_TYPE::X_SPEED] = m_bulletEntity->GetVelocity().x;
+		inputs[(unsigned)JumpData::INPUT_TYPE::Y_DIST]	= m_bulletEntity->GetPosition().y;
+
 		std::vector<fann_type> outputs = m_ann->Run(inputs);
 
 		if (outputs[(unsigned)JumpData::OUTPUT_TYPE::JUMP] >= 0.9f)
 		{
-			m_mainEntity->AddForceToCenter(math::vec2(0.f, PLAYER_JUMP_FORCE));
+			m_mainEntity->SetVelocity(math::vec2(0.f, PLAYER_JUMP_FORCE));
 			m_isPlayerOnGround = false;
 		}
 	}
@@ -167,6 +178,8 @@ void GameScene::ContactEnterCallback(const ContactInfo & contactInfo)
 		{
 			contactInfo.m_bodyA->Destroy();
 			m_bulletEntity.reset();
+			if (m_secondBulletEntity) m_bulletEntity = m_secondBulletEntity;
+			m_secondBulletEntity.reset();
 			m_currScore++;
 		}
 	}
@@ -176,6 +189,8 @@ void GameScene::ContactEnterCallback(const ContactInfo & contactInfo)
 		{
 			contactInfo.m_bodyB->Destroy();
 			m_bulletEntity.reset();
+			if (m_secondBulletEntity) m_bulletEntity = m_secondBulletEntity;
+			m_secondBulletEntity.reset();
 			m_currScore++;
 		}
 	}
@@ -207,4 +222,6 @@ void GameScene::RestartGame()
 	m_gameCount++;
 
 	m_currScore = 0;
+
+	m_frameNum = 0;
 }

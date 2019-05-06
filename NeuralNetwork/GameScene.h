@@ -59,6 +59,4 @@ private:
 
 	std::map<unsigned, unsigned>		m_scoresStats;
 	bool								m_cutTraining;
-
-	GraphicsManager&					m_graphicsMgr;
 };

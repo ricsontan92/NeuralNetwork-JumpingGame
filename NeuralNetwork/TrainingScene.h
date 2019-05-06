@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <string>
 #include <vector>
 #include <memory>
@@ -7,6 +8,7 @@
 #include "FANN/fann.h"
 
 #include "math.h"
+#include "GLRenderer.h"
 #include "Randomizer.h"
 
 class ANNTrainer;
@@ -24,6 +26,7 @@ public:
 	TrainingScene(GraphicsManager& graphicsMgr, unsigned maxTrainingCount);
 	virtual ~TrainingScene();
 	virtual void Update(float dt);
+	virtual void Render() const;
 	ANNTrainer& GetANNTrainer() const;
 	virtual bool IsTraining() const;
 	virtual bool IsRunning() const;
@@ -50,10 +53,19 @@ protected:
 
 	std::unique_ptr<PhysicsManager> m_physicsMgr;
 
+	std::shared_ptr<PhysicsBody>	m_groundEntity;
 	std::shared_ptr<PhysicsBody>	m_mainEntity;
-	std::shared_ptr<PhysicsBody>	m_bulletEntity;
+	std::shared_ptr<PhysicsBody>	m_bulletEntity, m_secondBulletEntity;
+
+	GLRenderer::TextureInfo			m_characterTextureInfo;
+	GLRenderer::TextureInfo			m_groundTextureInfo;
+	GLRenderer::TextureInfo			m_bulletTextureInfo;
+	float							m_animTimer;
+	unsigned						m_frameNum;
 
 private:
+	mutable std::mutex				m_bulletMutex;
+	GraphicsManager&				m_graphicsMgr;
 	Randomizer						m_randomizer, m_bulletSpdRandomizer;
 	std::unique_ptr<ANNTrainer>		m_annTrainer;
 	std::unique_ptr<JumpData>		m_jumpData;

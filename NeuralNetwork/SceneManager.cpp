@@ -50,8 +50,9 @@ void SceneManager::Update(float dt)
 	}
 	else
 	{
-		if(m_renderSceneIdx >= 0 && static_cast<size_t>(m_renderSceneIdx) < m_trainingScenes.size())
-			m_trainingScenes[m_renderSceneIdx]->GetPhysicsManager().RenderDebugShapes();
+		if (m_renderSceneIdx >= 0 && static_cast<size_t>(m_renderSceneIdx) < m_trainingScenes.size())
+			m_trainingScenes[m_renderSceneIdx]->Render();
+
 
 		// check if training is completed
 		if (IsAllTrainingCompleted())

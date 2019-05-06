@@ -56,8 +56,6 @@ bool AppWindow::Init(unsigned winWd, unsigned winHt)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glEnable(GL_DEPTH_TEST);
-
 	glfwSetWindowSizeCallback(m_window, WindowSizeChangeCallback);
 
 	std::cout << "Graphics: " << glGetString(GL_RENDERER) << std::endl;;
